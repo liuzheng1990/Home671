@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
@@ -6,6 +6,8 @@ import models
 import schemas
 from datetime import datetime, timedelta
 from typing import Optional
+
+from services.tag_service import get_or_create_tags
 
 
 app = FastAPI()
@@ -55,24 +57,11 @@ def get_db():
         db.close()
 
 
-@app.post("/tasks", response_model=schemas.TaskResponse)
+@app.post("/tasks")
 def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
+    db_task = models.Task(title=task.title)
 
-    db_tags = []
-    for tag_name in task.tags:
-        tag = db.query(models.Tag).filter(models.Tag.name == tag_name).first()
-        if not tag:
-            tag = models.Tag(name=tag_name)
-            db.add(tag)
-            db.commit()
-            db.refresh(tag)
-        db_tags.append(tag)
-
-    db_task = models.Task(
-        title=task.title,
-        description=task.description,
-        tags=db_tags
-    )
+    db_task.tags = get_or_create_tags(db, task.tags)
 
     db.add(db_task)
     db.commit()
@@ -115,42 +104,27 @@ def get_tasks(
     return tasks
 
 
-@app.patch("/tasks/{task_id}", response_model=schemas.TaskResponse)
+@app.patch("/tasks/{task_id}")
 def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Depends(get_db)):
-    
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
 
     if not db_task:
-        return {"error": "Task not found"}
+        raise HTTPException(status_code=404, detail="Task not found")
 
-    # Update simple fields
     if task_update.title is not None:
         db_task.title = task_update.title
-
-    if task_update.description is not None:
-        db_task.description = task_update.description
 
     if task_update.completed is not None:
         db_task.completed = task_update.completed
 
-    # Update tags if provided
     if task_update.tags is not None:
-        db_tags = []
-        for tag_name in task_update.tags:
-            tag = db.query(models.Tag).filter(models.Tag.name == tag_name).first()
-            if not tag:
-                tag = models.Tag(name=tag_name)
-                db.add(tag)
-                db.commit()
-                db.refresh(tag)
-            db_tags.append(tag)
-
-        db_task.tags = db_tags
+        db_task.tags = get_or_create_tags(db, task_update.tags)
 
     db.commit()
     db.refresh(db_task)
 
     return db_task
+
 
 
 
