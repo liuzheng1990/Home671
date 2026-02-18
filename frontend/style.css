@@ -1,0 +1,19 @@
+body {
+    font-family: "Comic Sans MS", cursive;
+}
+
+.card {
+    border-radius: 20px;
+}
+
+.task-card {
+    transition: transform 0.2s;
+}
+
+.task-card:hover {
+    transform: scale(1.05);
+}
+
+.completed {
+    background-color: #d4edda !important;
+}

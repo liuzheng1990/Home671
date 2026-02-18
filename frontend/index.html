@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Fun Tasks</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-warning bg-gradient">
+
+    <div class="container py-4">
+
+        <!-- Title -->
+        <div class="text-center mb-4">
+            <h1 class="display-4 fw-bold">🌟 My Fun Tasks 🌟</h1>
+        </div>
+
+        <!-- Task List -->
+        <div class="row" id="taskContainer">
+            <!-- Task cards inserted here -->
+        </div>
+
+        <!-- Create Task Section -->
+        <div class="card shadow-lg mt-5">
+            <div class="card-body text-center">
+
+                <h3 class="mb-3">➕ Add a New Task</h3>
+
+                <input id="title" class="form-control form-control-lg mb-3 text-center"
+                    placeholder="What do I want to do?">
+
+                <!-- Tag Buttons -->
+                <div class="mb-3" id="tagButtons">
+                    <button class="btn btn-outline-primary m-1" onclick="toggleTag('📚 Study')">📚 Study</button>
+                    <button class="btn btn-outline-success m-1" onclick="toggleTag('🎵 Music')">🎵 Music</button>
+                    <button class="btn btn-outline-warning m-1" onclick="toggleTag('🧸 Play')">🧸 Play</button>
+                    <button class="btn btn-outline-danger m-1" onclick="toggleTag('🦷 Health')">🦷 Health</button>
+                    <button class="btn btn-outline-info m-1" onclick="toggleTag('🏃 Sport')">🏃 Sport</button>
+                </div>
+
+                <button class="btn btn-lg btn-success px-5" onclick="createTask()">
+                    ✨ Add Task ✨
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
