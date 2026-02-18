@@ -7,9 +7,36 @@ import schemas
 from datetime import datetime, timedelta
 from typing import Optional
 
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+def seed_default_tags(db: Session):
+
+    default_tags = [
+        {"name": "Study", "icon": "📚", "color": "primary"},
+        {"name": "Music", "icon": "🎵", "color": "success"},
+        {"name": "Play", "icon": "🧸", "color": "warning"},
+        {"name": "Health", "icon": "🦷", "color": "danger"},
+        {"name": "Sport", "icon": "🏃", "color": "info"},
+    ]
+
+    existing_count = db.query(models.Tag).count()
+
+    if existing_count == 0:
+        for tag_data in default_tags:
+            tag = models.Tag(**tag_data)
+            db.add(tag)
+
+        db.commit()
+
+
+models.Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def startup_event():
+    db = SessionLocal()
+    seed_default_tags(db)
+    db.close()
 
 
 app.add_middleware(
@@ -88,6 +115,48 @@ def get_tasks(
     return tasks
 
 
+@app.patch("/tasks/{task_id}", response_model=schemas.TaskResponse)
+def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Depends(get_db)):
+    
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+
+    if not db_task:
+        return {"error": "Task not found"}
+
+    # Update simple fields
+    if task_update.title is not None:
+        db_task.title = task_update.title
+
+    if task_update.description is not None:
+        db_task.description = task_update.description
+
+    if task_update.completed is not None:
+        db_task.completed = task_update.completed
+
+    # Update tags if provided
+    if task_update.tags is not None:
+        db_tags = []
+        for tag_name in task_update.tags:
+            tag = db.query(models.Tag).filter(models.Tag.name == tag_name).first()
+            if not tag:
+                tag = models.Tag(name=tag_name)
+                db.add(tag)
+                db.commit()
+                db.refresh(tag)
+            db_tags.append(tag)
+
+        db_task.tags = db_tags
+
+    db.commit()
+    db.refresh(db_task)
+
+    return db_task
+
+
+
+@app.get("/tags", response_model=list[schemas.TagResponse])
+def get_tags(db: Session = Depends(get_db)):
+    return db.query(models.Tag).all()
 
 
 @app.get("/reports/weekly")
