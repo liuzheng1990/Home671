@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🌈 Kid To-Do App</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #fceabb, #f7c028);
+            min-height: 100vh;
+        }
+
+        .card {
+            border-radius: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-top: 30px;
+        }
+
+        .create-card {
+            background: #ffffffcc;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container py-4">
+
+        <h1 class="text-center mb-4">🌟 My Fun To-Do List 🌟</h1>
+
+        <!-- Create Task Section -->
+        <div class="card create-card shadow p-4 mb-4">
+            <h3>Create a New Task 🎨</h3>
+
+            <div class="mb-3">
+                <input type="text" id="title" class="form-control form-control-lg"
+                    placeholder="What do you want to do today?">
+            </div>
+
+            <!-- Dynamic Tags Container -->
+            <div id="tagButtons" class="mb-3">
+                <!-- Tags will be injected here from backend -->
+            </div>
+
+            <button onclick="createTask()" class="btn btn-primary btn-lg">
+                ➕ Add Task
+            </button>
+        </div>
+
+        <!-- Active Tasks -->
+        <h2 class="section-title text-success">🌟 Tasks To Do</h2>
+        <div id="activeTasks" class="row"></div>
+
+        <!-- Completed Tasks -->
+        <h2 class="section-title text-muted">🎉 Completed Tasks</h2>
+        <div id="completedTasks" class="row"></div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

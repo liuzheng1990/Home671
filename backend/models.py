@@ -28,6 +28,9 @@ class Tag(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True)
+    color = Column(String)   # Bootstrap color name
+    icon = Column(String)    # Emoji
 
     tasks = relationship("Task", secondary=task_tags, back_populates="tags")
+
 

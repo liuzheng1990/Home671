@@ -2,18 +2,25 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
+
 class TagBase(BaseModel):
     name: str
+    color: str
+    icon: str
 
 class TagResponse(TagBase):
     id: int
+
     class Config:
         from_attributes = True
+
+
 
 class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
     tags: List[str] = []
+
 
 class TaskResponse(BaseModel):
     id: int
@@ -25,3 +32,10 @@ class TaskResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    completed: Optional[bool] = None
+    tags: Optional[List[str]] = None
