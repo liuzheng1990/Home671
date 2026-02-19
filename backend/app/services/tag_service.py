@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Tag
+from ..models import Tag
 
 def get_or_create_tags(db: Session, tag_names: list[str]) -> list[Tag]:
     tags = []

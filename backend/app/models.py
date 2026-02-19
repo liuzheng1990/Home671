@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from database import Base
+from .database import Base
+
 
 task_tags = Table(
     "task_tags",

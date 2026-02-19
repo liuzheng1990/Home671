@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:8000";
+const API_URL = "/api";
 
 let selectedTags = [];
 
@@ -6,7 +6,7 @@ let selectedTags = [];
    Load Tags From Backend
 ===================================== */
 async function loadTags() {
-    const response = await fetch(`${API}/tags`);
+    const response = await fetch(`${API_URL}/tags`);
     const tags = await response.json();
 
     const tagContainer = document.getElementById("tagButtons");
@@ -52,7 +52,7 @@ async function createTask() {
         return;
     }
 
-    await fetch(`${API}/tasks`, {
+    await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -84,7 +84,7 @@ async function createTask() {
    Toggle Complete / Undo
 ===================================== */
 async function toggleComplete(taskId, currentState) {
-    await fetch(`${API}/tasks/${taskId}`, {
+    await fetch(`${API_URL}/tasks/${taskId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,7 +99,7 @@ async function toggleComplete(taskId, currentState) {
    Load Tasks
 ===================================== */
 async function loadTasks() {
-    const response = await fetch(`${API}/tasks`);
+    const response = await fetch(`${API_URL}/tasks`);
     const tasks = await response.json();
 
     const activeContainer = document.getElementById("activeTasks");
@@ -138,6 +138,7 @@ async function loadTasks() {
         const button = document.createElement("button");
 
         if (task.completed) {
+            title.classList.add("card-completed");
             button.className = "btn btn-warning mt-2";
             button.innerText = "↩️ Undo";
         } else {
