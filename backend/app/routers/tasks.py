@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, Annotated
 from datetime import datetime, timedelta
 
 
@@ -13,24 +13,21 @@ from ..services.tag_service import get_or_create_tags
 router = APIRouter()
 
 @router.post("/tasks")
-def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
+def create_task(task: schemas.TaskCreate, 
+                db: Annotated[Session, Depends(get_db)]) -> schemas.TaskResponse:
     db_task = models.Task(title=task.title)
-
     db_task.tags = get_or_create_tags(db, task.tags)
 
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
-
     return db_task
 
 
-@router.get("/tasks", response_model=list[schemas.TaskResponse])
-def get_tasks(
-    date_range: Optional[str] = Query(None),
-    tags: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
-):
+@router.get("/tasks")
+def get_tasks(date_range: Optional[str] = Query(None),
+              tags: Optional[str] = Query(None),
+              db: Session = Depends(get_db)) -> list[schemas.TaskResponse]:
     query = db.query(models.Task)
 
     # ---- Date Range Filter ----
