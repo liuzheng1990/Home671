@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A full-stack containerized todo/task management web app ("Katherine's To-Do List"). The app supports creating tasks with tags, filtering by date range and tags, and marking tasks complete.
 
+**Target audience: children using tablets.** All frontend decisions should reflect this — large tap targets, bold/playful visuals, minimal text input, simple interactions, and bright encouraging feedback. Prefer touch-friendly UI patterns over mouse-oriented ones.
+
 ## Running the Project
 
 **Production (Docker):**

@@ -24,3 +24,39 @@ body {
     color: rgb(163, 163, 163);
     text-decoration: line-through;
 }
+
+/* ---- Week Tabs ---- */
+.week-tabs {
+    gap: 8px;
+    border-bottom: none;
+    margin-top: 20px;
+}
+
+.week-tabs .nav-link {
+    font-size: 1.3rem;
+    font-weight: bold;
+    padding: 14px 28px;
+    border-radius: 16px 16px 0 0 !important;
+    border: 3px solid transparent !important;
+    color: #555;
+    background: #ffffffaa;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.week-tabs .nav-link:active {
+    transform: scale(0.96);
+}
+
+.week-tabs .nav-link.active {
+    background: #ffffff;
+    color: #333;
+    border: 3px solid #f7c028 !important;
+    border-bottom-color: #ffffff !important;
+}
+
+.tab-body {
+    background: #ffffff;
+    border-radius: 0 16px 16px 16px;
+    padding: 20px;
+    border: 3px solid #f7c028;
+}

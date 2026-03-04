@@ -36,17 +36,52 @@
             </button>
         </section>
 
-        <!-- Active Tasks -->
-        <section>
-            <h2 class="section-title text-success">🌟 Tasks To Do</h2>
-            <div id="activeTasks" class="row"></div>
-        </section>
+        <!-- Week Tabs -->
+        <ul class="nav nav-tabs week-tabs" id="weekTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#thisWeek" type="button" role="tab">
+                    🌟 This Week
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lastWeek" type="button" role="tab">
+                    📅 Last Week
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#twoWeeksAgo" type="button" role="tab">
+                    🗓️ Two Weeks Ago
+                </button>
+            </li>
+        </ul>
 
-        <!-- Completed Tasks -->
-        <section>
-            <h2 class="section-title text-muted">🎉 Completed Tasks</h2>
-            <div id="completedTasks" class="row"></div>
-        </section>
+        <div class="tab-content tab-body" id="weekTabContent">
+
+            <!-- This Week -->
+            <div class="tab-pane fade show active" id="thisWeek" role="tabpanel">
+                <h2 class="section-title text-success">⭐ Tasks To Do</h2>
+                <div id="thisWeekActive" class="row"></div>
+                <h2 class="section-title text-muted">🎉 Completed</h2>
+                <div id="thisWeekCompleted" class="row"></div>
+            </div>
+
+            <!-- Last Week -->
+            <div class="tab-pane fade" id="lastWeek" role="tabpanel">
+                <h2 class="section-title text-success">⭐ Tasks To Do</h2>
+                <div id="lastWeekActive" class="row"></div>
+                <h2 class="section-title text-muted">🎉 Completed</h2>
+                <div id="lastWeekCompleted" class="row"></div>
+            </div>
+
+            <!-- Two Weeks Ago -->
+            <div class="tab-pane fade" id="twoWeeksAgo" role="tabpanel">
+                <h2 class="section-title text-success">⭐ Tasks To Do</h2>
+                <div id="twoWeeksAgoActive" class="row"></div>
+                <h2 class="section-title text-muted">🎉 Completed</h2>
+                <div id="twoWeeksAgoCompleted" class="row"></div>
+            </div>
+
+        </div>
 
     </main>
 
