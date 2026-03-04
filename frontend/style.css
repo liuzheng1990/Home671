@@ -16,13 +16,74 @@ body {
     margin-top: 30px;
 }
 
-.create-card {
-    background: #ffffffcc;
-}
-
 .card-completed {
     color: rgb(163, 163, 163);
     text-decoration: line-through;
+}
+
+/* ---- Top Navbar ---- */
+.kid-navbar {
+    background: linear-gradient(135deg, #f7c028, #f5901e);
+    padding: 14px 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.kid-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.kid-nav-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.kid-nav-btn {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px 26px;
+    border-radius: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.kid-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.kid-nav-btn.active {
+    background: #fff;
+    color: #e07b00;
+    border-color: #fff;
+}
+
+.kid-nav-btn:active {
+    transform: scale(0.93);
+}
+
+/* ---- Create Task Modal ---- */
+.create-modal {
+    border-radius: 28px;
+    overflow: hidden;
+    border: none;
+}
+
+.add-task-btn {
+    font-size: 1.3rem;
+    padding: 14px;
+    border-radius: 16px;
 }
 
 /* ---- Week Tabs ---- */
@@ -59,4 +120,22 @@ body {
     border-radius: 0 16px 16px 16px;
     padding: 20px;
     border: 3px solid #f7c028;
+}
+
+/* ---- History Placeholder ---- */
+.history-placeholder {
+    background: #ffffffcc;
+    border-radius: 28px;
+    padding: 60px 40px;
+    margin-top: 20px;
+}
+
+.history-icon {
+    font-size: 6rem;
+    animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+@keyframes trophy-bounce {
+    0%, 100% { transform: translateY(0);    }
+    50%       { transform: translateY(-12px); }
 }

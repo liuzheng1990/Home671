@@ -61,6 +61,9 @@ async function createTask() {
         })
     });
 
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById("createTaskModal")).hide();
+
     // Reset form
     titleInput.value = "";
     selectedTags = [];
@@ -204,6 +207,18 @@ async function loadTasks() {
         loadTasksForWeek("lastWeekActive",    "lastWeekCompleted",    1),
         loadTasksForWeek("twoWeeksAgoActive", "twoWeeksAgoCompleted", 2)
     ]);
+}
+
+/* =====================================
+   View Switching (Tasks / History)
+===================================== */
+function showView(viewName) {
+    document.getElementById("tasksView").style.display   = viewName === "tasks"   ? "" : "none";
+    document.getElementById("historyView").style.display = viewName === "history" ? "" : "none";
+
+    document.querySelectorAll(".kid-nav-btn[data-view]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === viewName);
+    });
 }
 
 /* =====================================

@@ -52,7 +52,7 @@ def get_tasks(date_range: Optional[str] = Query(None),
             models.Tag.name.in_(tag_list)
         )
 
-    tasks = query.all()
+    tasks = query.order_by(models.Task.created_at.desc()).all()
     return tasks
 
 
