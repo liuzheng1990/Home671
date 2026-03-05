@@ -105,6 +105,12 @@
                     <input type="text" id="title" class="form-control form-control-lg mb-3"
                         placeholder="What do you want to do? 🤔">
 
+                    <div class="mb-4">
+                        <label for="taskCount" class="form-label fw-bold">🔢 How many times?</label>
+                        <input type="number" id="taskCount" class="form-control form-control-lg"
+                            min="1" max="10" value="1">
+                    </div>
+
                     <div id="tagButtons" class="mb-4"></div>
 
                     <button onclick="createTask()" class="btn btn-primary btn-lg w-100 add-task-btn">
@@ -130,6 +136,9 @@
                     <!-- Task Title (Editable) -->
                     <input type="text" id="detailTitle" class="form-control form-control-lg mb-4"
                         placeholder="Task title...">
+
+                    <!-- Completion Status -->
+                    <div id="completionStatus" class="mb-4"></div>
 
                     <!-- Tags Section -->
                     <h5 class="fw-bold mb-2">🏷️ Tags</h5>

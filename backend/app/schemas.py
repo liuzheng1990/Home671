@@ -28,6 +28,7 @@ class TaskResponse(BaseModel):
     description: Optional[str]
     completed: bool
     created_at: datetime
+    completed_at: Optional[datetime]
     tags: List[TagResponse]
 
     class Config:

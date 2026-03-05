@@ -68,6 +68,11 @@ def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Dep
 
     if task_update.completed is not None:
         db_task.completed = task_update.completed
+        # Set completed_at timestamp when marking as complete, clear when marking as incomplete
+        if task_update.completed:
+            db_task.completed_at = datetime.now()
+        else:
+            db_task.completed_at = None
 
     if task_update.tags is not None:
         db_task.tags = get_or_create_tags(db, task_update.tags)

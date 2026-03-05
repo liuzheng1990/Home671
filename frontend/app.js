@@ -49,26 +49,43 @@ function toggleTag(tagName, buttonElement, color) {
 async function createTask() {
     const titleInput = document.getElementById("title");
     const title = titleInput.value.trim();
+    const taskCountInput = document.getElementById("taskCount");
+    const taskCount = parseInt(taskCountInput.value) || 1;
 
     if (!title) {
-        alert("Please enter a task!");
+        alert("Please enter a task! 📝");
         return;
     }
 
-    await fetch(`${API_URL}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            title: title,
-            tags: selectedTags
-        })
-    });
+    if (taskCount < 1 || taskCount > 10) {
+        alert("Please enter a number between 1 and 10! 🔢");
+        return;
+    }
+
+    // Create multiple tasks with numbered titles
+    const createPromises = [];
+    for (let i = 1; i <= taskCount; i++) {
+        const numberedTitle = taskCount > 1 ? `${title} ${i}` : title;
+
+        const promise = fetch(`${API_URL}/tasks`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: numberedTitle,
+                tags: selectedTags
+            })
+        });
+        createPromises.push(promise);
+    }
+
+    await Promise.all(createPromises);
 
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById("createTaskModal")).hide();
 
     // Reset form
     titleInput.value = "";
+    taskCountInput.value = "1";
     selectedTags = [];
 
     // Reset tag buttons
@@ -107,6 +124,24 @@ function openTaskDetail(task) {
 
     // Populate title
     document.getElementById("detailTitle").value = task.title;
+
+    // Populate completion status
+    const completionStatusDiv = document.getElementById("completionStatus");
+    let statusHTML = "";
+
+    if (task.completed && task.completed_at) {
+        const completedDate = new Date(task.completed_at);
+        const formattedDate = completedDate.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+        statusHTML = `<div class="completion-status completed">✅ Completed on ${formattedDate}</div>`;
+    } else {
+        statusHTML = `<div class="completion-status pending">⏳ Not yet completed</div>`;
+    }
+    completionStatusDiv.innerHTML = statusHTML;
 
     // Populate tags
     const detailTagContainer = document.getElementById("detailTagButtons");

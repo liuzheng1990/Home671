@@ -97,6 +97,22 @@ body {
     font-size: 1.3rem;
     padding: 14px;
     border-radius: 16px;
+    transition: transform 0.1s;
+}
+
+.add-task-btn:active {
+    transform: scale(0.95);
+}
+
+#taskCount {
+    font-size: 1.2rem;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.form-label {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
 }
 
 /* ---- Task Detail Modal ---- */
@@ -143,6 +159,26 @@ body {
 
 #detailTagButtons .btn:active {
     transform: scale(0.95);
+}
+
+.completion-status {
+    background: #f8f9fa;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.completion-status.completed {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.completion-status.pending {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
 }
 
 /* ---- Week Tabs ---- */
