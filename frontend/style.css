@@ -11,16 +11,226 @@ body {
     font-size: 1.5rem;
 }
 
+.task-card {
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+.task-card:active {
+    transform: translateY(-2px);
+}
+
 .section-title {
     font-size: 2rem;
     margin-top: 30px;
 }
 
-.create-card {
-    background: #ffffffcc;
-}
-
 .card-completed {
     color: rgb(163, 163, 163);
     text-decoration: line-through;
+}
+
+/* ---- Top Navbar ---- */
+.kid-navbar {
+    background: linear-gradient(135deg, #f7c028, #f5901e);
+    padding: 14px 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.kid-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.kid-nav-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.kid-nav-btn {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px 26px;
+    border-radius: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.kid-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.kid-nav-btn.active {
+    background: #fff;
+    color: #e07b00;
+    border-color: #fff;
+}
+
+.kid-nav-btn:active {
+    transform: scale(0.93);
+}
+
+/* ---- Create Task Modal ---- */
+.create-modal {
+    border-radius: 28px;
+    overflow: hidden;
+    border: none;
+}
+
+.add-task-btn {
+    font-size: 1.3rem;
+    padding: 14px;
+    border-radius: 16px;
+    transition: transform 0.1s;
+}
+
+.add-task-btn:active {
+    transform: scale(0.95);
+}
+
+#taskCount {
+    font-size: 1.2rem;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.form-label {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+/* ---- Task Detail Modal ---- */
+.detail-modal {
+    border-radius: 28px;
+    overflow: hidden;
+    border: none;
+}
+
+.save-task-btn {
+    font-size: 1.3rem;
+    padding: 14px;
+    border-radius: 16px;
+    transition: transform 0.1s;
+}
+
+.save-task-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-task-btn {
+    font-size: 1.3rem;
+    padding: 14px;
+    border-radius: 16px;
+    transition: transform 0.1s;
+}
+
+.delete-task-btn:active {
+    transform: scale(0.95);
+}
+
+#detailTagButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#detailTagButtons .btn {
+    font-size: 1.1rem;
+    padding: 10px 16px;
+    border-radius: 12px;
+    transition: transform 0.1s;
+}
+
+#detailTagButtons .btn:active {
+    transform: scale(0.95);
+}
+
+.completion-status {
+    background: #f8f9fa;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.completion-status.completed {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.completion-status.pending {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+/* ---- Week Tabs ---- */
+.week-tabs {
+    gap: 8px;
+    border-bottom: none;
+    margin-top: 20px;
+}
+
+.week-tabs .nav-link {
+    font-size: 1.3rem;
+    font-weight: bold;
+    padding: 14px 28px;
+    border-radius: 16px 16px 0 0 !important;
+    border: 3px solid transparent !important;
+    color: #555;
+    background: #ffffffaa;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.week-tabs .nav-link:active {
+    transform: scale(0.96);
+}
+
+.week-tabs .nav-link.active {
+    background: #ffffff;
+    color: #333;
+    border: 3px solid #f7c028 !important;
+    border-bottom-color: #ffffff !important;
+}
+
+.tab-body {
+    background: #ffffff;
+    border-radius: 0 16px 16px 16px;
+    padding: 20px;
+    border: 3px solid #f7c028;
+}
+
+/* ---- History Placeholder ---- */
+.history-placeholder {
+    background: #ffffffcc;
+    border-radius: 28px;
+    padding: 60px 40px;
+    margin-top: 20px;
+}
+
+.history-icon {
+    font-size: 6rem;
+    animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+@keyframes trophy-bounce {
+    0%, 100% { transform: translateY(0);    }
+    50%       { transform: translateY(-12px); }
 }

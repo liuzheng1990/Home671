@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import Optional, Annotated
 from datetime import datetime, timedelta
@@ -52,7 +52,7 @@ def get_tasks(date_range: Optional[str] = Query(None),
             models.Tag.name.in_(tag_list)
         )
 
-    tasks = query.all()
+    tasks = query.order_by(models.Task.created_at.desc()).all()
     return tasks
 
 
@@ -61,13 +61,18 @@ def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Dep
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
 
     if not db_task:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
 
     if task_update.title is not None:
         db_task.title = task_update.title
 
     if task_update.completed is not None:
         db_task.completed = task_update.completed
+        # Set completed_at timestamp when marking as complete, clear when marking as incomplete
+        if task_update.completed:
+            db_task.completed_at = datetime.now()
+        else:
+            db_task.completed_at = None
 
     if task_update.tags is not None:
         db_task.tags = get_or_create_tags(db, task_update.tags)
@@ -76,3 +81,16 @@ def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Dep
     db.refresh(db_task)
 
     return db_task
+
+
+@router.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+
+    if not db_task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    db.delete(db_task)
+    db.commit()
+
+    return None

@@ -20,6 +20,7 @@ class Task(Base):
     description = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     completed = Column(Boolean, default=False)
+    completed_at = Column(DateTime, nullable=True)
 
     tags = relationship("Tag", secondary=task_tags, back_populates="tasks")
 
