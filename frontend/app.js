@@ -1,6 +1,8 @@
 const API_URL = "/api";
 
 let selectedTags = [];
+let currentEditingTask = null;
+let allTags = [];
 
 /* =====================================
    Load Tags From Backend
@@ -8,6 +10,7 @@ let selectedTags = [];
 async function loadTags() {
     const response = await fetch(`${API_URL}/tags`);
     const tags = await response.json();
+    allTags = tags;
 
     const tagContainer = document.getElementById("tagButtons");
     tagContainer.innerHTML = "";
@@ -97,6 +100,109 @@ async function toggleComplete(taskId, currentState) {
 }
 
 /* =====================================
+   Open Task Detail Modal
+===================================== */
+function openTaskDetail(task) {
+    currentEditingTask = task;
+
+    // Populate title
+    document.getElementById("detailTitle").value = task.title;
+
+    // Populate tags
+    const detailTagContainer = document.getElementById("detailTagButtons");
+    detailTagContainer.innerHTML = "";
+
+    allTags.forEach(tag => {
+        const button = document.createElement("button");
+        button.className = `btn m-1`;
+
+        // Check if this tag is already selected
+        const isSelected = task.tags.some(t => t.name === tag.name);
+        if (isSelected) {
+            button.className += ` btn-${tag.color}`;
+        } else {
+            button.className += ` btn-outline-${tag.color}`;
+        }
+
+        button.innerText = `${tag.icon} ${tag.name}`;
+        button.onclick = () => toggleDetailTag(tag, button);
+
+        detailTagContainer.appendChild(button);
+    });
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("taskDetailModal"));
+    modal.show();
+}
+
+/* =====================================
+   Toggle Tag in Detail Modal
+===================================== */
+function toggleDetailTag(tag, buttonElement) {
+    const isSelected = currentEditingTask.tags.some(t => t.name === tag.name);
+
+    if (isSelected) {
+        // Remove tag
+        currentEditingTask.tags = currentEditingTask.tags.filter(t => t.name !== tag.name);
+        buttonElement.classList.remove(`btn-${tag.color}`);
+        buttonElement.classList.add(`btn-outline-${tag.color}`);
+    } else {
+        // Add tag
+        currentEditingTask.tags.push(tag);
+        buttonElement.classList.remove(`btn-outline-${tag.color}`);
+        buttonElement.classList.add(`btn-${tag.color}`);
+    }
+}
+
+/* =====================================
+   Save Task Changes
+===================================== */
+async function saveTaskChanges() {
+    const newTitle = document.getElementById("detailTitle").value.trim();
+
+    if (!newTitle) {
+        alert("Please enter a task title! 📝");
+        return;
+    }
+
+    const tagNames = currentEditingTask.tags.map(t => t.name);
+
+    await fetch(`${API_URL}/tasks/${currentEditingTask.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            title: newTitle,
+            tags: tagNames
+        })
+    });
+
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById("taskDetailModal")).hide();
+
+    // Reload tasks
+    loadTasks();
+}
+
+/* =====================================
+   Delete Task
+===================================== */
+async function deleteTask() {
+    if (!confirm("Are you sure you want to delete this task? 🗑️")) {
+        return;
+    }
+
+    await fetch(`${API_URL}/tasks/${currentEditingTask.id}`, {
+        method: "DELETE"
+    });
+
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById("taskDetailModal")).hide();
+
+    // Reload tasks
+    loadTasks();
+}
+
+/* =====================================
    Week Range Helpers
 ===================================== */
 function getWeekRange(weeksAgo) {
@@ -128,7 +234,9 @@ function createTaskCard(task) {
     col.className = "col-md-4 col-sm-6 mb-4";
 
     const card = document.createElement("div");
-    card.className = "card shadow h-100";
+    card.className = "card shadow h-100 task-card";
+    card.style.cursor = "pointer";
+    card.onclick = () => openTaskDetail(task);
 
     const cardBody = document.createElement("div");
     cardBody.className = "card-body text-center";
@@ -160,7 +268,10 @@ function createTaskCard(task) {
         button.innerText = "⭐ Complete";
     }
 
-    button.onclick = () => toggleComplete(task.id, task.completed);
+    button.onclick = (e) => {
+        e.stopPropagation();
+        toggleComplete(task.id, task.completed);
+    };
 
     /* ----- Assemble Card ----- */
     cardBody.appendChild(title);

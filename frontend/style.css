@@ -11,6 +11,19 @@ body {
     font-size: 1.5rem;
 }
 
+.task-card {
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+.task-card:active {
+    transform: translateY(-2px);
+}
+
 .section-title {
     font-size: 2rem;
     margin-top: 30px;
@@ -84,6 +97,52 @@ body {
     font-size: 1.3rem;
     padding: 14px;
     border-radius: 16px;
+}
+
+/* ---- Task Detail Modal ---- */
+.detail-modal {
+    border-radius: 28px;
+    overflow: hidden;
+    border: none;
+}
+
+.save-task-btn {
+    font-size: 1.3rem;
+    padding: 14px;
+    border-radius: 16px;
+    transition: transform 0.1s;
+}
+
+.save-task-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-task-btn {
+    font-size: 1.3rem;
+    padding: 14px;
+    border-radius: 16px;
+    transition: transform 0.1s;
+}
+
+.delete-task-btn:active {
+    transform: scale(0.95);
+}
+
+#detailTagButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#detailTagButtons .btn {
+    font-size: 1.1rem;
+    padding: 10px 16px;
+    border-radius: 12px;
+    transition: transform 0.1s;
+}
+
+#detailTagButtons .btn:active {
+    transform: scale(0.95);
 }
 
 /* ---- Week Tabs ---- */

@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import Optional, Annotated
 from datetime import datetime, timedelta
@@ -61,7 +61,7 @@ def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Dep
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
 
     if not db_task:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
 
     if task_update.title is not None:
         db_task.title = task_update.title
@@ -76,3 +76,16 @@ def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Dep
     db.refresh(db_task)
 
     return db_task
+
+
+@router.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+
+    if not db_task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    db.delete(db_task)
+    db.commit()
+
+    return None
