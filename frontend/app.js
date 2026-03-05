@@ -291,6 +291,17 @@ function createTaskCard(task) {
         tagContainer.appendChild(badge);
     });
 
+    /* ----- Completion Date (for completed tasks) ----- */
+    let completionDateDiv = null;
+    if (task.completed && task.completed_at) {
+        const completedDate = new Date(task.completed_at);
+        const dayOfWeek = completedDate.toLocaleDateString("en-US", { weekday: "long" });
+
+        completionDateDiv = document.createElement("p");
+        completionDateDiv.className = "text-muted small mb-2";
+        completionDateDiv.innerText = `✅ Completed on ${dayOfWeek}`;
+    }
+
     /* ----- Complete / Undo Button ----- */
     const button = document.createElement("button");
 
@@ -311,6 +322,9 @@ function createTaskCard(task) {
     /* ----- Assemble Card ----- */
     cardBody.appendChild(title);
     cardBody.appendChild(tagContainer);
+    if (completionDateDiv) {
+        cardBody.appendChild(completionDateDiv);
+    }
     cardBody.appendChild(button);
 
     card.appendChild(cardBody);
