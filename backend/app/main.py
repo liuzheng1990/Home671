@@ -19,10 +19,11 @@ def seed_default_tags(db: Session):
 
     default_tags = [
         {"name": "English", "icon": "📚", "color": "primary"},
-        {"name": "Dance", "icon": "🎵", "color": "success"},
+        {"name": "Dance", "icon": "💃", "color": "success"},
         {"name": "Chinese", "icon": "🏡", "color": "warning"},
         {"name": "Math", "icon": "🧮", "color": "danger"},
         {"name": "Sports", "icon": "🏃", "color": "info"},
+        {"name": "Music", "icon": "🎵", "color": "secondary"},
     ]
 
     existing_count = db.query(models.Tag).count()
