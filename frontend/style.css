@@ -217,20 +217,42 @@ body {
     border: 3px solid #f7c028;
 }
 
-/* ---- History Placeholder ---- */
-.history-placeholder {
-    background: #ffffffcc;
-    border-radius: 28px;
-    padding: 60px 40px;
-    margin-top: 20px;
+/* ---- History: Stat Cards ---- */
+.history-stat-card {
+    border-radius: 20px;
+    padding: 24px 16px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+.history-stat-card--completed { background: linear-gradient(135deg, #a8e6a3, #4caf50); color: #fff; }
+.history-stat-card--total     { background: linear-gradient(135deg, #fff3c4, #f7c028); color: #333; }
+.history-stat-number { font-size: 4rem; font-weight: 900; line-height: 1; }
+.history-stat-label  { font-size: 1.3rem; font-weight: bold; margin-top: 8px; }
 
-.history-icon {
-    font-size: 6rem;
-    animation: trophy-bounce 2s ease-in-out infinite;
-}
+/* ---- History: Chart Cards ---- */
+.history-chart-card  { background: #fff; border-radius: 20px; padding: 20px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 16px; }
+.history-chart-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 12px; color: #333; }
+.history-chart-wrapper { position: relative; height: 260px; }
 
-@keyframes trophy-bounce {
-    0%, 100% { transform: translateY(0);    }
-    50%       { transform: translateY(-12px); }
+/* ---- History: Badges ---- */
+.history-section-heading { font-size: 2rem; font-weight: bold; color: #333; }
+.history-badges-section  { background: #ffffffcc; border-radius: 28px; }
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    justify-items: center;
 }
+.badge-card {
+    width: 140px; min-height: 140px; border-radius: 20px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 16px 12px; text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.15s;
+}
+.badge-card:active           { transform: scale(0.95); }
+.badge-card--earned          { background: linear-gradient(135deg,#fff9c4,#f7c028); border: 3px solid #f5901e; }
+.badge-card--locked          { background: #e0e0e0; border: 3px solid #bdbdbd; opacity: 0.65; }
+.badge-card__emoji           { font-size: 3rem; line-height: 1; }
+.badge-card__label           { font-size: 0.95rem; font-weight: bold; margin-top: 10px; color: #333; }
+.badge-card--locked .badge-card__label { color: #888; }

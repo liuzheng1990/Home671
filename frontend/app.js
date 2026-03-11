@@ -3,6 +3,7 @@ const API_URL = "/api";
 let selectedTags = [];
 let currentEditingTask = null;
 let allTags = [];
+const historyCharts = {};  // tracks Chart.js instances to destroy before re-render
 
 /* =====================================
    Load Tags From Backend
@@ -379,6 +380,246 @@ function showView(viewName) {
     document.querySelectorAll(".kid-nav-btn[data-view]").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.view === viewName);
     });
+
+    if (viewName === "history") loadHistoryView();
+}
+
+/* =====================================
+   History Dashboard
+===================================== */
+
+async function loadHistoryView() {
+    const { start: s0, end: e0 } = getWeekRange(0);
+    const { start: s1, end: e1 } = getWeekRange(1);
+    const range0 = `${formatDateTime(s0)},${formatDateTime(e0)}`;
+    const range1 = `${formatDateTime(s1)},${formatDateTime(e1)}`;
+
+    const [res0, res1] = await Promise.all([
+        fetch(`${API_URL}/tasks?date_range=${encodeURIComponent(range0)}`),
+        fetch(`${API_URL}/tasks?date_range=${encodeURIComponent(range1)}`)
+    ]);
+    const thisWeekTasks = await res0.json();
+    const lastWeekTasks = await res1.json();
+
+    renderHistoryTab("histThisWeekContent", thisWeekTasks, 0);
+    renderHistoryTab("histLastWeekContent", lastWeekTasks, 1);
+    renderBadges(thisWeekTasks, lastWeekTasks);
+}
+
+function renderHistoryTab(containerId, tasks, weeksAgo) {
+    const completed = tasks.filter(t => t.completed).length;
+    const total = tasks.length;
+
+    const container = document.getElementById(containerId);
+    container.innerHTML = `
+        <div class="row g-3 mb-4 mt-1">
+            <div class="col-6">
+                <div class="history-stat-card history-stat-card--completed">
+                    <div class="history-stat-number">${completed}</div>
+                    <div class="history-stat-label">✅ Done!</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="history-stat-card history-stat-card--total">
+                    <div class="history-stat-number">${total}</div>
+                    <div class="history-stat-label">📋 Total</div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <div class="history-chart-card">
+                    <h4 class="history-chart-title">📊 By Subject</h4>
+                    <div class="history-chart-wrapper">
+                        <canvas id="tagChart-${weeksAgo}"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="history-chart-card">
+                    <h4 class="history-chart-title">📅 Each Day</h4>
+                    <div class="history-chart-wrapper">
+                        <canvas id="dayChart-${weeksAgo}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    historyCharts[`tag-${weeksAgo}`]?.destroy();
+    historyCharts[`day-${weeksAgo}`]?.destroy();
+
+    renderTagChart(`tagChart-${weeksAgo}`, tasks, weeksAgo);
+    renderDayChart(`dayChart-${weeksAgo}`, tasks, weeksAgo);
+}
+
+function computeTagStats(tasks) {
+    const map = new Map();
+    tasks.forEach(task => {
+        task.tags.forEach(tag => {
+            if (!map.has(tag.name)) {
+                map.set(tag.name, { icon: tag.icon, color: tag.color, completed: 0, total: 0 });
+            }
+            const entry = map.get(tag.name);
+            entry.total++;
+            if (task.completed) entry.completed++;
+        });
+    });
+    return Array.from(map.entries())
+        .map(([name, v]) => ({ tagName: name, ...v }))
+        .sort((a, b) => a.tagName.localeCompare(b.tagName));
+}
+
+function renderTagChart(canvasId, tasks, weeksAgo) {
+    const stats = computeTagStats(tasks);
+    const ctx = document.getElementById(canvasId).getContext("2d");
+
+    if (stats.length === 0) {
+        ctx.canvas.parentElement.innerHTML = '<p class="text-center text-muted pt-5" style="font-size:1.2rem;">No tasks yet! 🌱</p>';
+        return;
+    }
+
+    historyCharts[`tag-${weeksAgo}`] = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: stats.map(s => `${s.icon} ${s.tagName}`),
+            datasets: [
+                {
+                    label: "Completed",
+                    data: stats.map(s => s.completed),
+                    backgroundColor: "#4caf50",
+                    borderRadius: 8
+                },
+                {
+                    label: "Total",
+                    data: stats.map(s => s.total),
+                    backgroundColor: "#ffe082",
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { font: { size: 14 } } }
+            },
+            scales: {
+                x: { ticks: { font: { size: 13 }, stepSize: 1 }, beginAtZero: true },
+                y: { ticks: { font: { size: 15 } } }
+            }
+        }
+    });
+}
+
+function computeDayStats(tasks) {
+    const counts = [0, 0, 0, 0, 0, 0, 0]; // Mon=0 … Sun=6
+    tasks.forEach(task => {
+        if (task.completed && task.completed_at) {
+            const dayIndex = (new Date(task.completed_at).getDay() + 6) % 7;
+            counts[dayIndex]++;
+        }
+    });
+    return counts;
+}
+
+function renderDayChart(canvasId, tasks, weeksAgo) {
+    const counts = computeDayStats(tasks);
+    const ctx = document.getElementById(canvasId).getContext("2d");
+    const dayColors = ["#f7c028", "#f5901e", "#4caf50", "#2196f3", "#e91e63", "#9c27b0", "#ff5722"];
+
+    historyCharts[`day-${weeksAgo}`] = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [{
+                label: "Tasks Done",
+                data: counts,
+                backgroundColor: dayColors,
+                borderRadius: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { ticks: { font: { size: 15 } } },
+                y: { beginAtZero: true, ticks: { font: { size: 13 }, stepSize: 1 } }
+            }
+        }
+    });
+}
+
+function computeBadges(thisWeekTasks, lastWeekTasks) {
+    const twCompleted = thisWeekTasks.filter(t => t.completed);
+    const lwCompleted = lastWeekTasks.filter(t => t.completed);
+
+    // 3-Day Streak: distinct calendar days with at least one completion this week
+    const twDays = new Set(twCompleted.filter(t => t.completed_at).map(t => new Date(t.completed_at).toDateString()));
+
+    // Power Day: max completions on a single calendar day (across both weeks)
+    const allCompleted = [...twCompleted, ...lwCompleted].filter(t => t.completed_at);
+    const dayCounts = {};
+    allCompleted.forEach(t => {
+        const d = new Date(t.completed_at).toDateString();
+        dayCounts[d] = (dayCounts[d] || 0) + 1;
+    });
+    const maxDay = Math.max(0, ...Object.values(dayCounts));
+
+    // All-Rounder: distinct tags in completed tasks this week
+    const twTagNames = new Set(twCompleted.flatMap(t => t.tags.map(tag => tag.name)));
+
+    // Getting Better: completion rates
+    const twRate = thisWeekTasks.length > 0 ? twCompleted.length / thisWeekTasks.length : 0;
+    const lwRate = lastWeekTasks.length > 0 ? lwCompleted.length / lastWeekTasks.length : 0;
+
+    return [
+        {
+            emoji: "🏆",
+            label: "Perfect Week!",
+            earned: thisWeekTasks.length > 0 && twCompleted.length === thisWeekTasks.length
+        },
+        {
+            emoji: "🥇",
+            label: "Last Week Champ",
+            earned: lastWeekTasks.length > 0 && lwCompleted.length === lastWeekTasks.length
+        },
+        {
+            emoji: "🔥",
+            label: "3-Day Streak",
+            earned: twDays.size >= 3
+        },
+        {
+            emoji: "⚡",
+            label: "Power Day",
+            earned: maxDay >= 3
+        },
+        {
+            emoji: "🌈",
+            label: "All-Rounder",
+            earned: twTagNames.size >= 3
+        },
+        {
+            emoji: "📈",
+            label: "Getting Better!",
+            earned: thisWeekTasks.length > 0 && lastWeekTasks.length > 0 && twRate > lwRate
+        }
+    ];
+}
+
+function renderBadges(thisWeekTasks, lastWeekTasks) {
+    const badges = computeBadges(thisWeekTasks, lastWeekTasks);
+    const grid = document.getElementById("badgesGrid");
+    grid.innerHTML = badges.map(b => `
+        <div class="badge-card ${b.earned ? "badge-card--earned" : "badge-card--locked"}">
+            <div class="badge-card__emoji">${b.earned ? b.emoji : "??"}</div>
+            <div class="badge-card__label">${b.label}</div>
+        </div>
+    `).join("");
 }
 
 /* =====================================
