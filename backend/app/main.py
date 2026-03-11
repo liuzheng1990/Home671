@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -9,10 +11,6 @@ from . import models
 from . import schemas
 from .routers import tasks, tags
 from .services.tag_service import get_or_create_tags
-
-
-
-app = FastAPI()
 
 
 def seed_default_tags(db: Session):
@@ -37,12 +35,17 @@ def seed_default_tags(db: Session):
 
 
 models.Base.metadata.create_all(bind=engine)
-@app.on_event("startup")
-def startup_event():
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     db = SessionLocal()
     seed_default_tags(db)
     db.close()
+    yield
 
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

@@ -2,3 +2,6 @@ fastapi==0.129.0
 uvicorn==0.40.0
 sqlalchemy==2.0.46
 psycopg2-binary==2.9.11
+pytest==9.0.2
+httpx==0.28.1
+pytest-cov==7.0.0

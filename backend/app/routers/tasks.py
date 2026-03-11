@@ -15,7 +15,7 @@ router = APIRouter()
 @router.post("/tasks")
 def create_task(task: schemas.TaskCreate, 
                 db: Annotated[Session, Depends(get_db)]) -> schemas.TaskResponse:
-    db_task = models.Task(title=task.title)
+    db_task = models.Task(title=task.title, description=task.description)
     db_task.tags = get_or_create_tags(db, task.tags)
 
     db.add(db_task)
@@ -42,7 +42,7 @@ def get_tasks(date_range: Optional[str] = Query(None),
                 models.Task.created_at <= end_date
             )
         except ValueError:
-            return {"error": "Invalid date_range format. Use YYYY-MM-DD,YYYY-MM-DD"}
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date_range format. Use YYYY-MM-DD,YYYY-MM-DD")
 
     # ---- Tag Filter ----
     if tags:

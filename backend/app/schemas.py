@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
@@ -10,9 +10,7 @@ class TagBase(BaseModel):
 
 class TagResponse(TagBase):
     id: int
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 
@@ -30,9 +28,7 @@ class TaskResponse(BaseModel):
     created_at: datetime
     completed_at: Optional[datetime]
     tags: List[TagResponse]
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskUpdate(BaseModel):
