@@ -1,8 +1,9 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, cast, Date as SADate
 from sqlalchemy.orm import Session
 from typing import Optional, Annotated
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 
 from ..database import get_db
@@ -10,12 +11,21 @@ from .. import models, schemas
 from ..services.tag_service import get_or_create_tags
 
 
+def _current_week_monday() -> date:
+    today = date.today()
+    return today - timedelta(days=today.weekday())
+
+
 router = APIRouter()
 
 @router.post("/tasks")
 def create_task(task: schemas.TaskCreate, 
                 db: Annotated[Session, Depends(get_db)]) -> schemas.TaskResponse:
-    db_task = models.Task(title=task.title, description=task.description)
+    db_task = models.Task(
+        title=task.title,
+        description=task.description,
+        scheduled_for=task.scheduled_for or _current_week_monday(),
+    )
     db_task.tags = get_or_create_tags(db, task.tags)
 
     db.add(db_task)
@@ -37,9 +47,13 @@ def get_tasks(date_range: Optional[str] = Query(None),
             start_date = datetime.fromisoformat(start_str)
             end_date = datetime.fromisoformat(end_str)
 
+            effective_date = func.coalesce(
+                models.Task.scheduled_for,
+                cast(models.Task.created_at, SADate),
+            )
             query = query.filter(
-                models.Task.created_at >= start_date,
-                models.Task.created_at <= end_date
+                effective_date >= start_date.date(),
+                effective_date <= end_date.date(),
             )
         except ValueError:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date_range format. Use YYYY-MM-DD,YYYY-MM-DD")

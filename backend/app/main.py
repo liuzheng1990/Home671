@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
@@ -35,6 +36,10 @@ def seed_default_tags(db: Session):
 
 
 models.Base.metadata.create_all(bind=engine)
+
+with engine.connect() as conn:
+    conn.execute(text("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS scheduled_for DATE"))
+    conn.commit()
 
 
 @asynccontextmanager
