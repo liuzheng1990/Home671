@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Table, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
@@ -21,6 +21,7 @@ class Task(Base):
     created_at = Column(DateTime, default=datetime.now)
     completed = Column(Boolean, default=False)
     completed_at = Column(DateTime, nullable=True)
+    scheduled_for = Column(Date, nullable=True)
 
     tags = relationship("Tag", secondary=task_tags, back_populates="tasks")
 

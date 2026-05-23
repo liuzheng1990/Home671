@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date
 
 
 class TagBase(BaseModel):
@@ -18,6 +18,7 @@ class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
     tags: List[str] = []
+    scheduled_for: Optional[date] = None
 
 
 class TaskResponse(BaseModel):
@@ -27,6 +28,7 @@ class TaskResponse(BaseModel):
     completed: bool
     created_at: datetime
     completed_at: Optional[datetime]
+    scheduled_for: Optional[date]
     tags: List[TagResponse]
     model_config = ConfigDict(from_attributes=True)
 

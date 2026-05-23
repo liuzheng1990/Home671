@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect as sa_inspect, text
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
@@ -35,6 +36,12 @@ def seed_default_tags(db: Session):
 
 
 models.Base.metadata.create_all(bind=engine)
+
+existing_columns = [col["name"] for col in sa_inspect(engine).get_columns("tasks")]
+if "scheduled_for" not in existing_columns:
+    with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE tasks ADD COLUMN scheduled_for DATE"))
+        conn.commit()
 
 
 @asynccontextmanager

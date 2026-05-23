@@ -3,7 +3,10 @@ const API_URL = "/api";
 let selectedTags = [];
 let currentEditingTask = null;
 let allTags = [];
+let activeWeekTab = 0;  // -1=next week, 0=this week, 1=last week, 2=two weeks ago
 const historyCharts = {};  // tracks Chart.js instances to destroy before re-render
+
+function setActiveWeekTab(n) { activeWeekTab = n; }
 
 /* =====================================
    Load Tags From Backend
@@ -64,6 +67,10 @@ async function createTask() {
     }
 
     // Create multiple tasks with numbered titles
+    const { start: weekStart } = getWeekRange(activeWeekTab);
+    const pad = n => String(n).padStart(2, '0');
+    const scheduledFor = `${weekStart.getFullYear()}-${pad(weekStart.getMonth() + 1)}-${pad(weekStart.getDate())}`;
+
     const createPromises = [];
     for (let i = 1; i <= taskCount; i++) {
         const numberedTitle = taskCount > 1 ? `${title} ${i}` : title;
@@ -73,7 +80,8 @@ async function createTask() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 title: numberedTitle,
-                tags: selectedTags
+                tags: selectedTags,
+                scheduled_for: scheduledFor,
             })
         });
         createPromises.push(promise);
@@ -360,13 +368,14 @@ async function loadTasksForWeek(activeId, completedId, weeksAgo) {
 }
 
 /* =====================================
-   Load Tasks (All Three Weeks)
+   Load Tasks (All Four Weeks)
 ===================================== */
 async function loadTasks() {
     await Promise.all([
-        loadTasksForWeek("thisWeekActive",    "thisWeekCompleted",    0),
-        loadTasksForWeek("lastWeekActive",    "lastWeekCompleted",    1),
-        loadTasksForWeek("twoWeeksAgoActive", "twoWeeksAgoCompleted", 2)
+        loadTasksForWeek("nextWeekActive",    "nextWeekCompleted",    -1),
+        loadTasksForWeek("thisWeekActive",    "thisWeekCompleted",     0),
+        loadTasksForWeek("lastWeekActive",    "lastWeekCompleted",     1),
+        loadTasksForWeek("twoWeeksAgoActive", "twoWeeksAgoCompleted",  2),
     ]);
 }
 
