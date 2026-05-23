@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, cast, Date as SADate
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 from typing import Optional, Annotated
 from datetime import datetime, timedelta, date
@@ -47,13 +47,19 @@ def get_tasks(date_range: Optional[str] = Query(None),
             start_date = datetime.fromisoformat(start_str)
             end_date = datetime.fromisoformat(end_str)
 
-            effective_date = func.coalesce(
-                models.Task.scheduled_for,
-                cast(models.Task.created_at, SADate),
-            )
             query = query.filter(
-                effective_date >= start_date.date(),
-                effective_date <= end_date.date(),
+                or_(
+                    and_(
+                        models.Task.scheduled_for.isnot(None),
+                        models.Task.scheduled_for >= start_date.date(),
+                        models.Task.scheduled_for <= end_date.date(),
+                    ),
+                    and_(
+                        models.Task.scheduled_for.is_(None),
+                        models.Task.created_at >= start_date,
+                        models.Task.created_at <= end_date,
+                    ),
+                )
             )
         except ValueError:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date_range format. Use YYYY-MM-DD,YYYY-MM-DD")
